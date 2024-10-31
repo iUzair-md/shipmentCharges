@@ -6,16 +6,225 @@
     <title>Document</title>
     <link rel="stylesheet" href="index.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <script>
-        function showDiv(divId) {
+        function loadContent(divId, url) {
             // Hide all content divs
-            document.querySelectorAll('.content-div').forEach(div => {
-                div.style.display = 'none';
+            $('.content-div').hide();
+        
+            // Load the content into the specified div
+            $('#' + divId).load(url, function(response, status, xhr) {
+                if (status === "error") {
+                    // Handle error
+                    $('#' + divId).html('<p>Error loading content: ' + xhr.status + ' ' + xhr.statusText + '</p>');
+                } else {
+                    // Show the selected div
+                    $('#' + divId).show();
+                }
             });
-            // Show the selected div
-            document.getElementById(divId).style.display = 'block';
         }
-        </script>
+    </script>
+
+    <style>
+        /* Custom styles to make the modal more compact */
+        .modal-body {
+            padding: 10px 15px;
+        }
+        
+        .form-label {
+            font-size: 0.875rem;
+            margin-bottom: 2px;
+        }
+        
+        .form-control, .form-select {
+            font-size: 0.875rem;
+            padding: 4px 8px;
+            height: 30px;
+        }
+        
+        .mb-3 {
+            margin-bottom: 0.5rem !important;
+        }
+        
+        .modal-footer {
+            padding: 8px 15px;
+        }
+        
+        .btn {
+            font-size: 0.875rem;
+            padding: 4px 12px;
+        }
+    </style>
+
+    <script>
+    let count = 1;
+    function loadContentt(buyRateDiv, url) {
+    return new Promise((resolve, reject) => {
+        $.get(url, function(data) {
+            $(`#${buyRateDiv}`).html(data).show(); // Load the content into the div and show it
+            resolve(); // Resolve the promise when done
+        }).fail(function() {
+            reject("Error loading content"); // Handle errors
+        });
+    });
+}
+
+let isBuyrateLoaded = false;
+function addRowFromModal() {
+    // Retrieve data from modal fields
+    const charges = document.getElementById("chargesSelect").value;
+    const chargedPer = document.getElementById("chargedPerSelect").value;
+    const currency = document.getElementById("currencySelect").value;
+    const exRate = parseFloat(document.getElementById("exRateInput").value) || 0;
+    const quantity = parseFloat(document.getElementById("quantityInput").value) || 0;
+    const buyRate = parseFloat(document.getElementById("buyRateInput").value) || 0;
+    const preCollect = document.getElementById("preCollectSelect").value;
+    const requestTo = document.getElementById("requestToPerson").value;
+    const vat = document.getElementById("vatSelect").value;
+
+    let isValid = true; // Track validation status
+
+    // Clear previous error highlights and messages
+    document.querySelectorAll('.form-control, .form-select').forEach(field => {
+        field.classList.remove('is-invalid');
+    });
+
+    // Validation checks
+    if (charges === "Select Charge Description") {
+        document.getElementById("chargesSelect").classList.add('is-invalid');
+        isValid = false;
+    }
+    if (chargedPer === "Select Charge Per") {
+        document.getElementById("chargedPerSelect").classList.add('is-invalid');
+        isValid = false;
+    }
+    if (currency === "Select Currency") {
+        document.getElementById("currencySelect").classList.add('is-invalid');
+        isValid = false;
+    }
+    if (!exRate) {
+        document.getElementById("exRateInput").classList.add('is-invalid');
+        isValid = false;
+    }
+    if (!quantity) {
+        document.getElementById("quantityInput").classList.add('is-invalid');
+        isValid = false;
+    }
+    if (!buyRate) {
+        document.getElementById("buyRateInput").classList.add('is-invalid');
+        isValid = false;
+    }
+    if (preCollect === "Select Pre/Coll") {
+        document.getElementById("preCollectSelect").classList.add('is-invalid');
+        isValid = false;
+    }
+    if (requestTo === "Select Request To") {
+        document.getElementById("requestToPerson").classList.add('is-invalid');
+        isValid = false;
+    }
+    if (vat === "Select VAT") {
+        document.getElementById("vatSelect").classList.add('is-invalid');
+        isValid = false;
+    }
+
+    // If not valid, exit the function
+    if (!isValid) {
+        alert("Please fill out all required fields correctly.");
+        return;
+    }
+
+    // Calculate Amount and Amount SAR
+    const amount = buyRate;
+    const amountSar = buyRate * quantity;
+
+    function addRowToTable() {
+        const table = document.querySelectorAll('.container-fluid table')[1].querySelector('tbody');
+
+        // Create a new row with the data
+        const newRow = document.createElement("tr");
+        newRow.innerHTML = `
+            <td style="font-size: 11px;">${count++}</td>
+            <td style="font-size: 11px;">${charges}</td>
+            <td style="font-size: 11px;">${chargedPer}</td>
+            <td style="font-size: 11px;">${currency}</td>
+            <td style="font-size: 11px;">${exRate.toFixed(2)}</td>
+            <td style="font-size: 11px;">${buyRate.toFixed(2)}</td>
+            <td style="font-size: 11px;">${quantity}</td>
+            <td style="font-size: 11px;">${amount.toFixed(2)}</td>
+            <td style="font-size: 11px;">${amountSar.toFixed(2)}</td>
+            <td style="font-size: 11px;">${preCollect}</td>
+            <td style="font-size: 11px;">${requestTo}</td>
+            <td style="font-size: 11px;">${vat}</td>
+            <td style="font-size: 11px;">Edit</td>
+            <td style="font-size: 11px;">Not sent</td>
+            <button  style="border: 1px solid black; background-color: #d6d6d6; font-size: 14px; width: 16px; height: 16px; padding: 0;" class="delete-btn rounded-0 btn btn-sm btn-close"></button>
+        `;
+
+        // Append the new row to the table
+        table.appendChild(newRow);
+    }
+
+    // Only load content if not already loaded
+    if (!isBuyrateLoaded) {
+        loadContentt('buyRateDiv', 'buyrate.html').then(() => {
+            isBuyrateLoaded = true; // Mark content as loaded
+            addRowToTable(); // Add the first row after loading
+        });
+    } else {
+        addRowToTable(); // If already loaded, just add the row
+    }
+
+    // Close the modal and reset the form if necessary
+    const modal = bootstrap.Modal.getInstance(document.getElementById("chargesModal"));
+    modal.hide();
+    clearModalFields();
+}
+
+// Add CSS class for invalid inputs
+document.head.insertAdjacentHTML('beforeend', `
+    <style>
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+    </style>
+`);
+
+
+function clearModalFields() {
+    document.querySelectorAll('.form-control, .form-select').forEach(field => {
+        field.classList.remove('is-invalid'); // Clear error highlights
+    });
+
+    // Reset select fields to default
+    document.getElementById("chargesSelect").selectedIndex = 0;
+    document.getElementById("chargedPerSelect").selectedIndex = 0;
+    document.getElementById("currencySelect").selectedIndex = 0;
+    document.getElementById("preCollectSelect").selectedIndex = 0;
+    document.getElementById("requestToPerson").selectedIndex = 0;
+    document.getElementById("vatSelect").selectedIndex = 0;
+
+    // Clear input fields
+    document.getElementById("exRateInput").value = '';
+    document.getElementById("quantityInput").value = '';
+    document.getElementById("buyRateInput").value = '';
+    document.getElementById("payableTo").value = '';
+    document.getElementById("supplierInv").value = '';
+    document.querySelector('input[type="date"]').value = '';
+    document.getElementById("sellRate").value = '';
+    document.getElementById("billedTo").value = '';
+}
+
+document.addEventListener("click", function(event) {
+    if (event.target && event.target.classList.contains("delete-btn")) {
+        const row = event.target.closest("tr");
+        row.remove(); // Remove the selected row
+    }
+});
+    // Attach the function to the "Save" button in the modal
+    document.querySelector("#chargesModal .btn-success").addEventListener("click", addRowFromModal);
+    </script>
+    
+    
 </head>
 <body>
 
@@ -24,85 +233,237 @@
         <div class="container-fluid m-0 p-2 pt-3">
             <div class="row align-items-center">
                 <!-- Logo on the left -->
-                <div class="col d-flex align-items-center">
-                    <h1 class="h6  mb-0" style="font-size:15px; color:green; font-weight: bold" >SHIPMENT CHARGES</h1>
+                <div class="col d-flex ">
+                    <h1 class="h6  mb-0" style="font-size:14px; color:green; font-weight: bold" >SHIPMENT CHARGES</h1>
                 </div>
                 <!-- Button on the right -->
                 <div class="col text-end">
-                    <a class="btn  btn-primary  btn-sm" style="font-size:13px;color: white; background-color: green" href="@Url.Page("/AddCharges")">Add Buy & Sell</a>
+                    <button class="btn btn-success btn-sm rounded-0 border-0" data-bs-toggle="modal" data-bs-target="#chargesModal" style="font-size: 12px; color: white;">Add Buy & Sell</button>
                 </div>
-            </div>
-                <hr style="border: 1px solid green; margin: 10px 0;" />
-        </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="chargesModal" tabindex="-1" aria-labelledby="chargesModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header py-2">
+                                <h5 class="modal-title" id="chargesModalLabel">Add Charges</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;" >Charges</label>
+                                        <select class="form-select rounded-0 border border-secondary" id="chargesSelect">
+                                            <option selected>Select Charge Description</option>
+                                            <option >3PL LICENSE CHARGES</option>
+                                            <option >ADDITIONAL CHARGES DUE TO TERMINAL CONGESTION</option>
+                                            <option >ADDITIONAL CHARGES SF</option>
+                                            <option >ADDITIONAL FREE TIME CHARGE</option>
+                                            <option >ADDITIONAL SPL HANDLING CHARGES</option>
+                                            <option >ADDITIONAL TRANSPORTATION CHARGES</option>
+                                            <option >ADMINISTRATIVE CHARGES</option>
+                                            <option >ADVANCED CHARGES</option>
+                                            <option >AES FEE</option>
+                                            <option >AGENCYSERVICE FEE</option>
+                                            <option >ALL IN</option>
+                                            <option >ALL-IN-CHARGES</option>
+                                            <option >AMENDMENT  DOCS  FEES</option>
+                                            <option >ATTESTATION CHARGES SF</option>
+                                            <option >ATTESTATION CHARGES SF</option>
+                                        
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">Charged Per</label>
+                                        <select class="form-select rounded-0 border border-secondary" id="chargedPerSelect">
+                                            <option selected>Select Charge Per</option>
+                                            <option >20FR</option>
+                                            <option >20GP</option>
+                                            <option >20HC</option>
+                                            <option >20OT</option>
+                                            <option >20TK</option>
+                                            <option >40FR</option>
+                                            <option >40GP</option>
+                                            <option >40HC</option>
+                                            <option >40OT</option>
+                                            <option >40TK</option>      
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">Currency</label>
+                                        <select class="form-select rounded-0 border border-secondary" id="currencySelect">
+                                            <option selected>Select Currency</option>
+                                            <option >SAR</option>
+                                            <option >INR</option>
+                                            <option >EUR</option>
+                                            <option >GBP</option>
+                                            <option >USD</option>
+                                            <option >SAR</option>
+                                            <option >SGD</option>
+                                            <option >TWD</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">Ex. Rate</label>
+                                        <input type="number" class="form-control rounded-0 border border-secondary" value="" id="exRateInput">
+                                    </div>
+                                    
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">Quantity</label>
+                                        <input type="number" class="form-control rounded-0 border border-secondary" id="quantityInput" value="">
+                                    </div>
+                                    <hr>
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">Buy Rate</label>
+                                        <input type="number" class="form-control rounded-0 border border-secondary" id="buyRateInput" value="">
+                                    </div>
+                                    
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">Payable To</label>
+                                        <input type="text" class="form-control rounded-0 border border-secondary" id="payableTo" placeholder="Payable To">
+                                    </div>
+                                    
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">Supplier Inv. No.</label>
+                                        <input type="text" class="form-control rounded-0 border border-secondary" id="supplierInv" placeholder="Supplier Inv No">
+                                    </div>
+                                    
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">Date</label>
+                                        <input type="date" class="form-control rounded-0 border border-secondary" id="date">
+                                    </div>
+                                    <hr>
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">Sell Rate</label>
+                                        <input type="number" class="form-control rounded-0 border border-secondary" value="" id="sellRate">
+                                    </div>
+                                    
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">Billed To</label>
+                                        <input type="text" class="form-control rounded-0 border border-secondary" value="" id="billedTo">
+                                    </div>
+                                    <hr>
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">VAT</label>
+                                        <select class="form-select rounded-0 border border-secondary" id="vatSelect">
+                                            <option selected>Select VAT</option>
+                                            <option >Yes</option>
+                                            <option >No</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">Prepaid / Collect</label>
+                                        <select class="form-select rounded-0 border border-secondary" id="preCollectSelect">
+                                            <option selected>Select Pre/Coll</option>
+                                            <option >Prepaid</option>
+                                            <option >Collect</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="mb-3 d-flex align-items-center gap-4">
+                                        <label class="form-label" style="width: 150px;">Request To</label>
+                                        <select class="form-select rounded-0 border border-secondary" id="requestToPerson" >
+                                            <option selected>Select Request To</option>
+                                            <option >Aman</option>
+                                            <option >Taufique</option>
+                                            <option >Uzair</option>
+                                            <option >Shakeel</option>
+                                            <option >Thaseef</option>
+                                            <option >Bharat</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer ">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-success" onclick="addRowFromModal()">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                <!-- Modal -->
+                </div>
+                    <hr style="border: 1px solid black; margin: 5px 0;" />
+                </div>
 
         <!-- Container 2 -->
-        <div class="container-fluid px-3">
+        <div class="container-fluid px-5">
             <div class="row d-flex justify-content-between">
                 <!-- Input Box 1 -->
                 <div class="col-sm-2 d-flex align-items-center ">
-                    <label for="input1" class="mb-0 " style="font-size:11px; width: 70px;">Job No</label>
-                    <input type="text" id="input1" class="form-control rounded-0 border border-secondary" style="height: 28px; font-size: 12px;" placeholder="">
+                    <label for="input1" class="mb-0 " style="font-size:10px; width: 50px;">Job No</label>
+                    <input type="text" id="input1" class="form-control rounded-0 border border-secondary" style="height: 21px; font-size: 12px;" placeholder="">
                 </div>
                 <!-- Input Box 2 -->
                 <div class="col-sm-4 d-flex align-items-center ">
-                    <label for="input2" class="mb-0 " style="font-size:11px ;  width: 70px;">Customer</label>
-                    <input type="text" id="input2" class="form-control rounded-0 border border-secondary" style="height: 28px; font-size: 12px;" placeholder="">
+                    <label for="input2" class="mb-0 " style="font-size:10px ;  width: 60px;">Customer</label>
+                    <input type="text" id="input2" class="form-control rounded-0 border border-secondary" style="height: 21px; font-size: 12px;" placeholder="">
                 </div>
                 <!-- Input Box 3 -->
                 <div class="col-sm-2 d-flex align-items-center">
-                    <label for="input3" class="mb-0 " style="font-size:11px;  width: 70px">MBL No</label>
-                    <input type="text" id="input3" class="form-control rounded-0 border border-secondary" style="height: 28px; font-size: 12px;" placeholder="">
+                    <label for="input3" class="mb-0 " style="font-size:10px;  width: 60px">MBL No</label>
+                    <input type="text" id="input3" class="form-control rounded-0 border border-secondary" style="height: 21px; font-size: 12px;" placeholder="">
                 </div>
                 <!-- Input Box 4 -->
                 <div class="col-sm-2 d-flex align-items-center">
-                    <label for="input4" class="mb-0 " style="font-size:11px;  width: 70px">HBL No</label>
-                    <input type="text" id="input4" class="form-control rounded-0 border border-secondary" style="height: 28px; font-size: 12px;" placeholder="">
+                    <label for="input4" class="mb-0 " style="font-size:10px;  width: 60px">HBL No</label>
+                    <input type="text" id="input4" class="form-control rounded-0 border border-secondary" style="height: 21px; font-size: 12px;" placeholder="">
                 </div>
             </div> 
         </div>
 
         <!-- Container 3-->
-        <div class="container-fluid p-3">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 style="font-weight: bold;">Job Details</h5>
-                <button id="toggleButton" class="btn btn-outline-secondary toggle-button">v</button>
-            </div>
+        <div class="container-fluid p-3 pb-2">
+            <div class="d-flex justify-content-between align-items-center px-3  border-top border-start border-end" 
+            style="background-color: #f0f0f0; border-top: 1px solid rgb(39, 39, 39) !important; border-left: 1px solid  rgb(39, 39, 39) !important; border-right: 1px solid  rgb(39, 39, 39) !important; border-radius: 4px 4px 0 0;">
+           <h6 class="mb-0" style="font-size: 12px;">Job Details</h6>
+           <button id="toggleButton" class="toggle-button" 
+                   style="transform: rotate(90deg); display: inline-block; background: transparent; border: none; padding: 0; font-size: 1.1rem;">&gt;</button>
+       </div>
+       
+       
             <!-- Input Fields Row -->
-            <div class="card" id="inputRow">
+            <div class="rounded-0 card" id="inputRow" style=" border-top: none; border-left: 1px solid black; border-right: 1px solid black; border-bottom: 1px solid black;">
                 <div class="card-body">
-                    <div class="row custom-gutter">
+                    <div class="row custom-gutter g-2" style="padding-right: 10px;">
                         <!-- Left Column -->
                         <div class="col-md-2">
-                            <div class="mb-2 d-flex align-items-center">
-                                <label class="mb-0 text-end" style="font-size:12px; width: 100px;">Total PKgs</label>
-                                <input type="text" class="form-control ms-2 rounded-0 border border-secondary" style="height: 28px; font-size: 12px; width: 80px;" value="">
+                            <div class="mb-1 d-flex align-items-center">
+                                <label class="mb-0 text-end" style="font-size:10px; width: 100px;">Total PKgs</label>
+                                <input type="text" class="form-control ms-2 rounded-0 border border-secondary" style="height: 21px; font-size: 10px; width: 120px;" value="">
                             </div>
-                            <div class="mb-2 d-flex align-items-center">
-                                <label class="mb-0 text-end" style="font-size:12px; width: 100px;">Total Gross Wt.</label>
-                                <input type="text" class="form-control ms-2 rounded-0 border border-secondary" style="height: 28px; font-size: 12px; width: 80px;" value="">
+                            <div class="mb-1 d-flex align-items-center">
+                                <label class="mb-0 text-end" style="font-size:10px; width: 100px;">Total Gross Wt.</label>
+                                <input type="text" class="form-control ms-2 rounded-0 border border-secondary" style="height: 21px; font-size: 10px; width: 120px;" value="">
                             </div>
-                            <div class="mb-2 d-flex align-items-center">
-                                <label class="mb-0 text-end" style="font-size:12px; width: 100px;">Total Volume</label>
-                                <input type="text" class="form-control ms-2 rounded-0 border border-secondary" style="height: 28px; font-size: 12px; width: 80px;" value="">
+                            <div class="mb-0 d-flex align-items-center">
+                                <label class="mb-0 text-end" style="font-size:10px; width: 100px;">Total Volume</label>
+                                <input type="text" class="form-control ms-2 rounded-0 border border-secondary" style="height: 21px; font-size: 10px; width: 120px;" value="">
                             </div>
                         </div>
         
                         <!-- Middle Column -->
                         <div class="col-md-5">
-                            <div style="display: grid; grid-template-columns: 120px 1fr; gap: 8px; align-items: center;">
-                                <label class="mb-0 text-end" style="font-size:12px;">Shipper</label>
-                                <input type="text" class="rounded-0 border border-secondary form-control" style="height: 28px; font-size: 12px;" value="">
+                            <div style="display: grid; grid-template-columns: 120px 1fr; gap: 4px; align-items: center;">
+                                <label class="mb-0 text-end" style="font-size:10px;">Shipper</label>
+                                <input  id="shipperInput"  type="text" class="rounded-0 border border-secondary form-control" style="height: 21px; font-size: 10px;" value="">
                                 
-                                <label class="mb-0 text-end" style="font-size:12px;">Consignee</label>
-                                <input type="text" class="rounded-0 border border-secondary form-control" style="height: 28px; font-size: 12px;" value="">
+                                <label class="mb-0 text-end" style="font-size:10px;">Consignee</label>
+                                <input id="consigneeInput" type="text" class="rounded-0 border border-secondary form-control" style="height: 21px; font-size: 10px;" value="">
                                 
-                                <label class="mb-0 text-end" style="font-size:12px;">Estimated Cost</label>
+                                <label class="mb-0 text-end" style="font-size:10px;">Estimated Cost</label>
                                 <div class="d-flex" style="gap: 35px;"> 
                                    
-                                    <input type="text" class="rounded-0 border border-secondary form-control" style="height: 28px; font-size: 12px; width: 120px;" value="">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <label class="mb-0 text-end" style="font-size:12px; width: 80px;">Actual Cost</label>
-                                        <input type="text" class=" rounded-0 border border-secondary form-control" style="height: 28px; font-size: 12px; width: 120px;" value="">
+                                    <input type="text" class="rounded-0 border border-secondary form-control" style="height: 21px; font-size: 10px; width: 120px;" value="">
+                                    <div class="d-flex align-items-center gap-4">
+                                        <label class="mb-0 text-end" style="font-size:10px; width: 80px;">Actual Cost</label>
+                                        <input type="text" class=" rounded-0 border border-secondary form-control" style="height: 21px; font-size: 10px; width: 120px;" value="">
                                     </div>
                                 </div>
                             </div>
@@ -111,24 +472,24 @@
                         <!-- Right Column -->
 
                         <div class="col-md-5">
-                            <div style="display: grid; grid-template-columns: 100px 1fr; gap: 8px; align-items: center;">
-                                <label class="mb-0 text-end" style="font-size:12px;">Forwarding Agent</label>
-                                <input type="text" class="form-control rounded-0 border border-secondary" style="height: 28px; font-size: 12px; width: 100%;" value="">
+                            <div style="display: grid; grid-template-columns: 100px 1fr; gap: 4px; align-items: center;">
+                                <label class="mb-0 text-end" style="font-size:10px;">Forwarding Agent</label>
+                                <input id="forwardingAgentInput" type="text" class="form-control rounded-0 border border-secondary" style="height: 21px; font-size: 10px; width: 100%;" value="">
                                 
-                                <label class="mb-0 text-end" style="font-size:12px;">Destination Agent</label>
-                                <input type="text" class="form-control rounded-0 border border-secondary" style="height: 28px; font-size: 12px; width: 100%;" value="">
+                                <label class="mb-0 text-end" style="font-size:10px;">Destination Agent</label>
+                                <input id="destinationAgentInput" type="text" class="form-control rounded-0 border border-secondary" style="height: 21px; font-size: 10px; width: 100%;" value="">
                                 
-                                <label class="mb-0 text-end" style="font-size:12px;">Revenue</label>
+                                <label class="mb-0 text-end" style="font-size:10px;">Revenue</label>
                                 <div class="d-flex" style="gap: 2px;">
-                                    <input type="text" class="form-control rounded-0 border border-secondary" style="height: 28px; font-size: 12px; width: 90px;" value=""> <!-- Adjusted width -->
+                                    <input type="text" class="form-control rounded-0 border border-secondary" style="height: 21px; font-size: 10px; width: 90px;" value=""> <!-- Adjusted width -->
                                     <div class="d-flex align-items-center gap-2">
-                                        <label class="mb-0 text-end" style="font-size:12px; width: 50px;">Profit</label>
-                                        <input type="text" class="form-control rounded-0 border border-secondary" style="height: 28px; font-size: 12px; width: 90px;" value=""> <!-- Adjusted width -->
+                                        <label class="mb-0 text-end" style="font-size:10px; width: 50px;">Profit</label>
+                                        <input type="text" class="form-control rounded-0 border border-secondary" style="height: 21px; font-size: 10px; width: 90px;" value=""> <!-- Adjusted width -->
                                     </div>
                                     
-                                    <div  class="d-flex align-items-center gap-2">
-                                        <label class="mb-0 text-end" style="font-size:12px; width: 50px;">VAT %</label>
-                                        <input type="text" class="form-control rounded-0 border border-secondary" style="height: 28px; font-size: 12px; width: 90px;" value=""> <!-- Adjusted width -->
+                                    <div  class="d-flex align-items-center gap-3">
+                                        <label class="mb-0 text-end" style="font-size:10px; width: 50px;">VAT %</label>
+                                        <input type="text" class="form-control rounded-0 border border-secondary" style="height: 21px; font-size: 10px; width: 90px;" value=""> <!-- Adjusted width -->
                                 
                                     </div>
                                     
@@ -141,39 +502,34 @@
             </div>
         
         </div>
-
-        <div class="d-flex gap-2 m-3">
-            <button class="btn btn-outline-primary" onclick="showDiv('buyRateDiv')">Buy Rate</button>
-            <button class="btn btn-outline-primary" onclick="showDiv('sellRateDiv')">Sell Rate</button>
-            <button class="btn btn-outline-primary" onclick="showDiv('invoicesDiv')">AR & AP Invoices</button>
-            <button class="btn btn-outline-primary" onclick="showDiv('profitDiv')">Profit</button>
+        <!-- Buttons -->
+        <div class="d-flex  m-3 mt-0 mb-1">
+            <button class="btn " 
+                    style="font-size: 12px;  background-color: rgb(173, 173, 173); color: white; border: none; margin-right: 2px; border-radius: 0;" 
+                    onclick="loadContent('buyRateDiv', 'buyrate.html')">Buy Rate</button>
+            <button class="btn" 
+                    style="font-size: 12px; background-color: rgb(173, 173, 173); color: white; border: none; margin-right: 2px; border-radius: 0;" 
+                    onclick="loadContent('sellRateDiv', 'sellrate.html')">Sell Rate</button>
+            <button class="btn" 
+                    style="font-size: 12px; background-color:  rgb(173, 173, 173); color: white; border: none; margin-right: 2px; border-radius: 0;" 
+                    onclick="loadContent('invoicesDiv', 'invoice.html')">AR & AP Invoices</button>
+            <button class="btn" 
+                    style="font-size: 12px; background-color:  rgb(173, 173, 173); color: white; border: none; border-radius: 0;" 
+                    onclick="loadContent('profitDiv', 'profitsheet.html')">Profit</button>
         </div>
+        
     <!-- Common Lyout -->
 
-    <div id="buyRateDiv" class="content-div" style="display: none;">
-        <h5>Buy Rate</h5>
-        <p>Details for Buy Rate...</p>
-    </div>
-    
-    <div id="sellRateDiv" class="content-div" style="display: none;">
-        <h5>Sell Rate</h5>
-        <p>Details for Sell Rate...</p>
-    </div>
-    
-    <div id="invoicesDiv" class="content-div" style="display: none;">
-        <h5>AR & AP Invoices</h5>
-        <p>Details for AR & AP Invoices...</p>
-    </div>
-    
-    <div id="profitDiv" class="content-div" style="display: none;">
-        <h5>Profit</h5>
-        <p>Details for Profit...</p>
-    </div>
+
+    <div id="buyRateDiv" class="content-div" style="display: none;"></div>
+    <div id="sellRateDiv" class="content-div" style="display: none;"></div>
+    <div id="invoicesDiv" class="content-div" style="display: none;"></div>
+    <div id="profitDiv" class="content-div" style="display: none;"></div>
     
     
 
 
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="dropdown.js" defer></script>
     <script src="dummyData.js"></script>
     <script src="main.js"></script>

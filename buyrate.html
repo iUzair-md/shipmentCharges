@@ -1,0 +1,168 @@
+<style>
+    /* Custom styles to set the width of each column */
+    .col-number {
+        width: 5%;
+    }
+    .col-billed-to {
+        width: 20%;
+    }
+    .col-remarks {
+        width: 20%;
+    }
+    .col-supplier-inv{
+
+    }
+    .col-confirm {
+        
+    }
+    .col-attach{
+
+    }
+    .col-print{
+
+    }
+    .col-email{
+
+    }
+    .col-pr-no{
+
+    }
+    .col-create-pv{
+
+    }
+
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex gap-2 p-1">
+        <button class="btn" 
+                style="font-size: 11px; background-color: #f0f0f0; color: black; border: 1px solid rgb(168, 168, 168); border-radius: 0;" 
+                >Save</button>
+        <button class="btn" 
+                style="font-size: 11px; background-color: #f0f0f0; color: black; border: 1px solid rgb(168, 168, 168); border-radius: 0;" 
+               >Print All</button>
+        <button class="btn" 
+                style="font-size: 11px; background-color: #f0f0f0; color: black; border: 1px solid rgb(168, 168, 168); border-radius: 0;" 
+                >Email All</button>
+        <button class="btn" 
+                style="font-size: 11px; background-color: #f0f0f0; color: black; border: 1px solid rgb(168, 168, 168); border-radius: 0;" 
+                >View Attachment</button>
+        <button class="btn" 
+                style="font-size: 11px; background-color: #f0f0f0; color: black; border: 1px solid rgb(168, 168, 168); border-radius: 0;" 
+                >Confirm</button>
+    </div>
+</div>
+
+<!-- Table 1 -->
+<div class="container-fluid m-1">
+    <div id="box" class="border border-dark ">
+        <div class="d-flex justify-content-between" style=" background-color: #f0f0f0; padding: 5px;">
+            <div class="d-flex align-items-center">
+                <button style="border: 1px solid black; background-color: #d6d6d6;  font-size: 14px; width: 16px; height: 16px; padding: 0; padding-bottom: 2px; display: flex; align-items: center; justify-content: center;" class="rounded-0 btn btn-sm">+</button>
+                <span class="ms-2" style="font-size: 12px;">Add Charges</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <button style="border: 1px solid black; background-color: #d6d6d6; font-size: 14px; width: 16px; height: 16px; padding: 0; padding-bottom: 2px; display: flex; align-items: center; justify-content: center;" class="rounded-0 btn btn-sm">~</button>
+                <span class="ms-2" style="font-size: 12px;">Refresh</span>
+            </div>
+        </div>
+
+        <!-- Table 1 -->
+        <div class="container-fluid">
+            <table class="table">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="col-number" style="font-size: 11px; background-color: #4A628A; color: white;">#</th>
+                        <th class="col-billed-to" style="font-size: 11px; background-color: #4A628A; color: white;">Payable To</th>
+                        <th class="col-remarks" style="font-size: 11px; background-color: #4A628A; color: white;">Remarks</th>
+                        <th class="col-supplier-inv" style="font-size: 11px; background-color: #4A628A; color: white;">Supplier Inv No</th>
+                        <th class="col-confirm" style="font-size: 11px; background-color: #4A628A; color: white;">Confirm</th>
+                        <th class="col-attach" style="font-size: 11px; background-color: #4A628A; color: white;">Attach</th>
+                        <th class="col-print" style="font-size: 11px; background-color: #4A628A; color: white;">Print</th>
+                        <th class="col-email" style="font-size: 11px; background-color: #4A628A; color: white;">Email</th>
+                        <th class="col-pr-no" style="font-size: 11px; background-color: #4A628A; color: white;">PR No</th>
+                        <th class="col-create-pv" style="font-size: 11px; background-color: #4A628A; color: white;">Create PV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td >  <label style="margin-top: 5px;">1</label></td>
+                        <td class="d-flex align-items-center" style="padding: 15px; font-size: 11px;">
+                            <input style=" font-size: 11px;" type="checkbox" id="person1" class="me-2" />
+                            <label style=" font-size: 11px;" for="person1">Person</label>
+                        </td>
+                        <td class="">
+                            <input type="text" class="rounded-0 form-control" style="margin-top: 3px; height: 22px; font-size: 11px;" placeholder="Enter remarks" />
+                        </td>
+                        <td >  <label style="margin-top: 5px; font-size: 11px;">2342</label></td>
+                        <td>
+                            <button style="font-size: 11px;background-color: #f0f0f0; border: 1px solid rgb(168, 168, 168); color: black;" class="rounded-0 ">Confirm</button>
+                        </td>
+                        <td>
+                            <a  style="font-size: 11px;" href="#" class="btn btn-link">Attach</a>
+                        </td>
+                        <td>
+                            <button style="font-size: 11px; background-color: #f0f0f0; border: 1px solid rgb(168, 168, 168); color: black;" class="rounded-0  ">Print</button>
+                        </td>
+                        <td>
+                            <button style="font-size: 11px; background-color: #f0f0f0; border: 1px solid rgb(168, 168, 168); color: black;" class="rounded-0 ">Email</button>
+                        </td>
+                        <td >  <label style="margin-top: 5px; font-size: 11px;">567567</label></td>
+                        <td>
+                            <button style="font-size: 11px;  background-color: #f0f0f0; border: 1px solid rgb(168, 168, 168);" class="rounded-0  ">Create PV</button>
+                        </td> 
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        
+
+        <!-- Table 2 -->
+        <div class="container-fluid">
+            <table class="table">
+                <thead class="thead-light">
+                    <tr>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">#</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Charges</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Charged Per</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Currency</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Ex. Rate</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Rate</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Qty</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Amount</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Amount SAR</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Pre/Coll</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Request To</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Is Vat</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Edit</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Confirmed</th>
+                        <th style="font-size: 11px; background-color: #4A628A; color: white;">Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td ></td>
+                        <td id="delete-btn"  ></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+

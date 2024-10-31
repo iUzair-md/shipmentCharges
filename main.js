@@ -44,6 +44,11 @@ document.addEventListener("DOMContentLoaded", () => {
         mblInput.value = job.mbl;
         hblInput.value = job.hbl;
         dropdown.style.display = "none";
+        document.getElementById("shipperInput").value = job.shipper;
+        document.getElementById("consigneeInput").value = job.consignee;
+        document.getElementById("forwardingAgentInput").value = job.forwardingagent;
+        document.getElementById("destinationAgentInput").value = job.destinationAgent;
+    
     }
 
     // Hide dropdown if clicking outside of it
